@@ -1,0 +1,30 @@
+[Actions]
+# Create resources for COMPONENT_NAMESPACE = "<MODULE-NAMESPACE-UPPERCASE>"
+CreateResource:Name=%DB_<MODULE-NAMESPACE-UPPERCASE>-CODE,Description=The <MODULE-NAMESPACE-UPPERCASE>-CODE database
+CreateResource:Name=%DB_<MODULE-NAMESPACE-UPPERCASE>-DATA,Description=The <MODULE-NAMESPACE-UPPERCASE>-DATA database
+CreateResource:Name=%DB_IPCLIB,Description=IPC Module code library
+
+# Create corresponding roles for each resource
+CreateRole:Name=%DB_<MODULE-NAMESPACE-UPPERCASE>-CODE,Resources=%DB_<MODULE-NAMESPACE-UPPERCASE>-CODE:RW
+CreateRole:Name=%DB_<MODULE-NAMESPACE-UPPERCASE>-DATA,Resources=%DB_<MODULE-NAMESPACE-UPPERCASE>-DATA:RW
+CreateRole:Name=%DB_IPCLIB,Resources=%DB_IPCLIB:RW
+CreateRole:Name=%HS_DB_<MODULE-NAMESPACE-UPPERCASE>,Resources=%DB_<MODULE-NAMESPACE-UPPERCASE>-CODE:RW,%DB_<MODULE-NAMESPACE-UPPERCASE>-DATA:RW,%DB_IPCLIB:RW
+
+# Create global and source code databases for the component namespace
+CreateDatabase:Name=<MODULE-NAMESPACE-UPPERCASE>-CODE,Directory=<instance-install-directory>/mgr/<MODULE-NAMESPACE-UPPERCASE>-code,Resource=%DB_<MODULE-NAMESPACE-UPPERCASE>-CODE
+CreateDatabase:Name=<MODULE-NAMESPACE-UPPERCASE>-DATA,Directory=<instance-install-directory>/mgr/<MODULE-NAMESPACE-UPPERCASE>-data,Resource=%DB_<MODULE-NAMESPACE-UPPERCASE>-DATA
+CreateDatabase:Name=IPCLIB,Directory=<instance-install-directory>/mgr/IPCLIB,Resource=%DB_IPCLIB
+
+# Create component namespace
+CreateNamespace:Name=<MODULE-NAMESPACE-UPPERCASE>,Globals=<MODULE-NAMESPACE-UPPERCASE>-DATA,Routines=<MODULE-NAMESPACE-UPPERCASE>-CODE,Interop=1
+
+# Create package mappings to the component namespace
+CreateMapPackage:Namespace="<MODULE-NAMESPACE-UPPERCASE>",Name="IPC",Database=IPCLIB
+CreateMapPackage:Namespace="<MODULE-NAMESPACE-UPPERCASE>",Name="IPCProductions",Database=IPCLIB
+
+# Install module into the component namespace using local tarball
+Execute:Namespace="<MODULE-NAMESPACE-UPPERCASE>",ClassName="%IPM.Main",MethodName="Shell",Arg1="load <path-and-filename-of-module-artifact> -verbose -DNoLock=1 -DNoTransaction=1 -DNoMapping=1 -synchronous"
+
+
+
+
